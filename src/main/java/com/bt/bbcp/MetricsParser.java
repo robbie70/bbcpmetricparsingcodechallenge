@@ -8,6 +8,9 @@ public class MetricsParser {
     private String metricsInput;
     private boolean loaded;
     private List<Metric> metrics = new ArrayList<>();
+    private long invalidMetrics;
+    private long validMetrics;
+
 
     public MetricsParser(ReaderService readerService) {
         metricsInput = readerService.getData();
@@ -15,15 +18,21 @@ public class MetricsParser {
     }
 
     public void parse() {
+        MetricState metricState = new MetricState();
+
         String[] lines = getMetricsInput().split("\n");
         for(String line : lines) {
             String[] fields = splitLineIntoFields(line);
             if (fields.length != 3) {
-                System.out.println("Invalid Metric found - incorrect number of fields - rejecting. <" + line + ">");
+                metricState.makeState("Invalid Metric found - incorrect number of fields - rejecting. <" + line + ">", Status.INVALID);
             }else {
-                Metric metric = MetricsBuilder.makeBasicGraphiteFormat(fields);
-                if (metric != null) {
+                Metric metric = MetricsBuilder.makeBasicGraphiteFormat(fields, metricState);
+                if (metricState.getStatus() == Status.OK) {
+                    validMetrics ++;
                     metrics.add(metric);
+                } else {
+                    invalidMetrics ++;
+                    System.out.println("metric " + line + " is invalid " + metricState.getMessage());
                 }
             }
         }
@@ -53,6 +62,14 @@ public class MetricsParser {
         for (Metric metric : metrics){
             System.out.println(metric.toString());
         }
+    }
+
+    public long getInvalidMetrics() {
+        return invalidMetrics;
+    }
+
+    public long getValidMetrics() {
+        return validMetrics;
     }
 
     @Override

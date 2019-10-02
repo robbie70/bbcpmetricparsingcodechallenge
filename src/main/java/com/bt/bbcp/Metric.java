@@ -4,6 +4,7 @@ public abstract class Metric {
 
     private String name;
     private Number value;
+
     private long milliSecondsSinceEpoch;
 
     public Metric(String name, Number value, long milliSecondsSinceEpoch) {
@@ -35,12 +36,19 @@ public abstract class Metric {
     public void setMilliSecondsSinceEpoch(int milliSecondsSinceEpoch) {
         this.milliSecondsSinceEpoch = milliSecondsSinceEpoch;
     }
+//    public long getSecondsSinceEpoch() {
+//        return milliSecondsSinceEpoch / 1000;
+//    }
+//
+//    public void setSecondsSinceEpoch(int SecondsSinceEpoch) {
+//        this.milliSecondsSinceEpoch = SecondsSinceEpoch * 1000;
+//    }
 
     @Override
     public String toString() {
         return "Metric{" +
                 "name='" + name + '\'' +
-                ", value=" + value +
+                ", result=" + value +
                 ", milliSecondsSinceEpoch=" + milliSecondsSinceEpoch +
                 '}';
     }
