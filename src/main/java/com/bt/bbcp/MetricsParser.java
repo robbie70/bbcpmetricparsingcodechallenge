@@ -31,8 +31,14 @@ public class MetricsParser {
                     validMetrics ++;
                     metrics.add(metric);
                 } else {
-                    invalidMetrics ++;
-                    System.out.println("metric " + line + " is invalid " + metricState.getMessage());
+                    metric = MetricsBuilder.makeTaggedGraphiteFormat(fields, metricState);
+                    if (metricState.getStatus() == Status.OK) {
+                        validMetrics++;
+                        metrics.add(metric);
+                    } else {
+                        invalidMetrics++;
+                        System.out.println("metric " + line + " is invalid " + metricState.getMessage());
+                    }
                 }
             }
         }

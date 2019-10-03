@@ -111,6 +111,35 @@ public class MetricsParserTest {
     }
 
     @Test
+    public void shouldValidateGraphiteTaggedMetricName() throws IOException {
+        String metricStringToTest = "some.metric.name;host=kipper;name=flash;test=ISOK 1234 156276319\n" ;
+        ReaderService readerService = new StringReaderService(metricStringToTest);
+        MetricsParser undertest = new MetricsParser(readerService);
+        String[] lines = undertest.getMetricsInput().split(System.getProperty("line.separator"));
+        undertest.parse();
+        List<Metric> metrics = undertest.getMetrics();
+        System.out.println(undertest.toString());
+        testSuccessFail(1, 0, 0, metrics, undertest);
+        assertEquals(true, undertest.isFileLoaded());
+    }
+
+    @Test
+    public void shouldValidateGraphiteMetricName() throws IOException {
+        String metricStringToTest = "a.metr|ic.name 1234 156276319\n" +
+                "another.metr^ic.result.cpu% 1.23 1562763195000\n" +
+                "% 1999991 1562763195000\n" +
+                "1stserver.result.cpu% 123123 1562763195000\n";
+        ReaderService readerService = new StringReaderService(metricStringToTest);
+        MetricsParser undertest = new MetricsParser(readerService);
+        String[] lines = undertest.getMetricsInput().split(System.getProperty("line.separator"));
+        undertest.parse();
+        List<Metric> metrics = undertest.getMetrics();
+        System.out.println(undertest.toString());
+        testSuccessFail(0, 0, 4, metrics, undertest);
+        assertEquals(true, undertest.isFileLoaded());
+    }
+
+    @Test
     public void shouldReadEachLineOfMetrics(){
         ReaderService readerService = new FileReaderService("metrics-file.log");
         MetricsParser undertest = new MetricsParser(readerService);
